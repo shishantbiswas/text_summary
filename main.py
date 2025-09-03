@@ -4,7 +4,7 @@ from transformers import T5Tokenizer, T5ForConditionalGeneration
 
 app = FastAPI()
 
-MODEL_PATH = "/home/shishant/code/sumray/text_summarization"
+MODEL_PATH = "/app/model"
 
 tokenizer = T5Tokenizer.from_pretrained(MODEL_PATH, legacy=False)
 model = T5ForConditionalGeneration.from_pretrained(MODEL_PATH)
