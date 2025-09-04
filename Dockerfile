@@ -1,18 +1,23 @@
-FROM python:3.12-slim
+FROM ollama/ollama
+
+RUN apt-get update && \
+    apt-get install -y python3 python3-pip python3-venv curl wget && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    git git-lfs \
-    && git lfs install \
-    && rm -rf /var/lib/apt/lists/*
+# Create venv
+RUN python3 -m venv /app/venv
+ENV PATH="/app/venv/bin:$PATH"
 
-RUN pip install --no-cache-dir transformers torch fastapi uvicorn protobuf sentencepiece
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-RUN git clone https://huggingface.co/Falconsai/text_summarization /app/model
+COPY ollama.py .
+COPY entrypoint.sh .
 
-COPY main.py /app/
+RUN chmod +x entrypoint.sh
 
 EXPOSE 8000
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+ENTRYPOINT ["./entrypoint.sh"]
